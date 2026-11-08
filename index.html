@@ -137,7 +137,7 @@ h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(44px,7v
       <button id="sb1" disabled>Başlat <kbd>B</kbd></button>
     </div>
   </div>
-  <div class="s-foot"><span class="s-mic" id="smic">Mikrofon açılıyor…</span><span>A / B başlat · R sıfırla · F tam ekran · M ayrıntılı ekran</span></div>
+  <div class="s-foot"><span class="s-mic" id="smic">Mikrofon açılıyor…</span><span>A / B başlat · S sıfırla · F tam ekran · M ayrıntılı ekran</span></div>
 </div>
 <div class="count" id="count" hidden></div>
 
@@ -182,7 +182,7 @@ h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(44px,7v
       </div>
       <div class="verdict" id="verdict" aria-live="polite">İki takım da ölçülünce kazanan burada görünür.</div>
       <div class="btnrow">
-        <button id="resetBtn">Sıfırla <kbd>R</kbd></button>
+        <button id="resetBtn">Sıfırla <kbd>S</kbd></button>
         <button id="sendBtn" disabled>Sonucu gönder ve kapat</button>
       </div>
       <label class="cal" for="cal"><span>Kalibrasyon (sessiz salon ≈ 40 dB olacak şekilde) <output id="calOut">+100</output></span>
@@ -501,7 +501,7 @@ document.addEventListener("pointerdown",()=>{ if(ac&&ac.state!=="running") ac.re
 document.addEventListener("keydown",e=>{
   if(e.target.tagName==="INPUT"||e.metaKey||e.ctrlKey||e.altKey) return;
   const k=e.key.toLowerCase();
-  if(k==="a") start(0); else if(k==="b") start(1); else if(k==="r") reset();
+  if(k==="a") start(0); else if(k==="b") start(1); else if(k==="s"||k==="r") reset();
   else if(k==="m") toggleMode(); else if(k==="f") fullscreen();
 });
 window.addEventListener("beforeunload",()=>send("closed",{}));
