@@ -8,18 +8,64 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=Barlow:wght@400;600&display=swap">
 <style>
-/* Sahne ekranı: solda büyük gösterge, sağda takım ölçümleri, altta tanılama */
+/* Basit mod: sahnede iki ölçer yan yana. Ayrıntılı mod (M): tek ölçer, kalibrasyon, tanılama. */
 :root{
-  --bg:#161616; --panel:#1f1b1c; --line:#3b3334; --fg:#F6ECDC; --muted:#b5a691;
+  --bg:#161616; --bg-hi:#251f20; --panel:#1f1b1c; --line:#3b3334; --fg:#F6ECDC; --muted:#b5a691;
   --red:#CE011F; --red-hi:#ff4d63; --purple:#5B2B8C; --purple-hi:#a46ae6;
-  --gold:#CFA46C; --amber:#E3A100; --ok:#5fbf7a; --bad:#ff6b6b;
+  --gold:#CFA46C; --amber:#E3A100; --ok:#5fbf7a; --bad:#ff6b6b; --veil:rgba(22,22,22,.78);
+  --grad-a:linear-gradient(180deg,#FF6A7E 0%,#CE011F 55%,#8A0014 100%);
+  --grad-b:linear-gradient(180deg,#E3C8FF 0%,#9A5BDD 50%,#5B2B8C 100%);
   --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
   --f-body:"Barlow","Segoe UI",Arial,sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--fg)}
+html,body{margin:0;background:var(--bg);color:var(--fg);height:100%}
 body{font-family:var(--f-body);font-size:16px;line-height:1.5}
+button{font-family:var(--f-display);font-weight:700;font-size:20px;letter-spacing:.05em;text-transform:uppercase;color:var(--fg);background:transparent;border:1.5px solid var(--line);border-radius:10px;padding:10px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:10px}
+button:hover:not(:disabled){border-color:var(--gold)}
+button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+button:disabled{opacity:.35;cursor:not-allowed}
+button.primary{background:var(--red);border-color:var(--red)}
+button.primary:hover:not(:disabled){background:var(--red-hi);border-color:var(--red-hi)}
+kbd{font-family:var(--f-body);font-size:.6em;font-weight:600;border:1px solid currentColor;border-radius:4px;padding:0 5px;opacity:.7}
+
+/* ---------- basit mod ---------- */
+.stage{display:none}
+body.simple .stage{display:flex}
+body.simple .wrap{display:none}
+.stage{position:fixed;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:4vh;padding-block:3vh 6vh;padding-left:max(16px,4vw);padding-right:max(16px,4vw);background:radial-gradient(ellipse at 50% 35%,var(--bg-hi) 0%,var(--bg) 70%);overflow:hidden}
+.s-title{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(36px,min(5.2vw,8.5vh),108px);line-height:1;letter-spacing:.02em;color:var(--gold);text-align:center;min-height:1.45em;display:flex;flex-direction:column;justify-content:center}
+.s-title.done{color:var(--amber)}
+.s-title small{font-size:.38em;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-top:.15em}
+.s-row{display:grid;grid-template-columns:1fr 1fr;gap:6vw;width:100%;max-width:1700px;align-items:start}
+.s-col{display:flex;flex-direction:column;align-items:center;gap:1.4vh;transition:transform .6s ease,filter .6s ease;min-width:0}
+.s-col svg{width:100%;max-width:min(760px,62vh);height:auto;display:block}
+.s-val{font-family:var(--f-display);font-weight:800;font-size:clamp(52px,min(7.4vw,12vh),150px);line-height:.9;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:.15em;margin-top:-1.4vh}
+.s-val.idle span{color:var(--line)}
+.s-val small{font-size:.32em;color:var(--muted);letter-spacing:.06em}
+.s-prog{width:min(70%,520px);height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.s-prog i{display:block;height:100%;width:0}
+.s-col.a .s-prog i{background:var(--red)} .s-col.b .s-prog i{background:var(--purple-hi)}
+.s-name{font-family:var(--f-display);font-weight:800;font-size:clamp(40px,min(5.4vw,9vh),116px);line-height:1.08;letter-spacing:.02em;padding:.05em .06em;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;text-align:center;overflow-wrap:anywhere;filter:drop-shadow(0 6px 0 rgba(0,0,0,.35))}
+.s-col.a .s-name{background-image:var(--grad-a)} .s-col.b .s-name{background-image:var(--grad-b)}
+.s-col button{font-size:clamp(18px,1.7vw,32px);padding:.45em 1.4em;border-width:2px}
+.s-col.a button{border-color:var(--red)} .s-col.b button{border-color:var(--purple-hi)}
+.s-col.a button:hover:not(:disabled){background:var(--red)} .s-col.b button:hover:not(:disabled){background:var(--purple)}
+.s-col.win{transform:scale(1.06)}
+.s-col.lose{transform:scale(.94);filter:saturate(.3) brightness(.55)}
+.s-foot{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-between;gap:16px;padding-block:10px max(10px,env(safe-area-inset-bottom,0px));padding-left:max(16px,2vw);padding-right:max(16px,2vw);font-size:14px;color:var(--muted)}
+.s-mic{color:var(--bad);font-weight:600}
+.count{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:var(--veil);font-family:var(--f-display);font-weight:800;font-size:min(52vh,40vw);line-height:1;font-variant-numeric:tabular-nums}
+.count[hidden]{display:none}
+.count.a{color:var(--red-hi)} .count.b{color:var(--purple-hi)}
+.count.go{font-size:min(30vh,20vw);letter-spacing:.03em}
+.count.pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(1.5);opacity:0}to{transform:scale(1);opacity:1}}
+@media (max-width:700px){.s-row{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.count.pop{animation:none}.s-col{transition:none}}
+
+/* ---------- ayrıntılı mod ---------- */
 .wrap{max-width:1180px;margin:0 auto;padding-block:24px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:24px}
 header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
 .eyebrow{margin:0;font-family:var(--f-display);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-size:14px}
@@ -38,13 +84,6 @@ h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(44px,7v
 .prog i{display:block;height:100%;width:0;background:var(--gold)}
 .side{display:flex;flex-direction:column;gap:16px;min-width:0}
 .btnrow{display:flex;flex-wrap:wrap;gap:10px}
-button{font-family:var(--f-display);font-weight:700;font-size:20px;letter-spacing:.05em;text-transform:uppercase;color:var(--fg);background:transparent;border:1.5px solid var(--line);border-radius:10px;padding:10px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:10px}
-button:hover:not(:disabled){border-color:var(--gold)}
-button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
-button:disabled{opacity:.4;cursor:not-allowed}
-button.primary{background:var(--red);border-color:var(--red)}
-button.primary:hover:not(:disabled){background:var(--red-hi);border-color:var(--red-hi)}
-kbd{font-family:var(--f-body);font-size:12px;font-weight:600;border:1px solid currentColor;border-radius:4px;padding:0 5px;opacity:.7}
 .teams{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media (max-width:420px){.teams{grid-template-columns:1fr}}
 .team{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
@@ -77,11 +116,36 @@ kbd{font-family:var(--f-body);font-size:12px;font-weight:600;border:1px solid cu
 @media (max-width:520px){.diag dl{grid-template-columns:minmax(0,1fr)} .diag dd{margin-bottom:6px}}
 </style>
 </head>
-<body>
+<body class="simple">
+
+<!-- ================= BASİT MOD ================= -->
+<div class="stage" aria-label="Alkışmetre sahne ekranı">
+  <h1 class="s-title" id="stitle" aria-live="polite">Alkışlar kime?</h1>
+  <div class="s-row">
+    <div class="s-col a" id="sc0">
+      <svg id="sg0" viewBox="0 0 400 240" role="img" aria-label="Takım A ölçeri"></svg>
+      <div class="s-val"><span id="sv0">–</span><small>dB</small></div>
+      <div class="s-prog" aria-hidden="true"><i id="sp0"></i></div>
+      <div class="s-name" id="sn0">Takım A</div>
+      <button id="sb0" disabled>Başlat <kbd>A</kbd></button>
+    </div>
+    <div class="s-col b" id="sc1">
+      <svg id="sg1" viewBox="0 0 400 240" role="img" aria-label="Takım B ölçeri"></svg>
+      <div class="s-val"><span id="sv1">–</span><small>dB</small></div>
+      <div class="s-prog" aria-hidden="true"><i id="sp1"></i></div>
+      <div class="s-name" id="sn1">Takım B</div>
+      <button id="sb1" disabled>Başlat <kbd>B</kbd></button>
+    </div>
+  </div>
+  <div class="s-foot"><span class="s-mic" id="smic">Mikrofon açılıyor…</span><span>A / B başlat · R sıfırla · F tam ekran · M ayrıntılı ekran</span></div>
+</div>
+<div class="count" id="count" hidden></div>
+
+<!-- ================= AYRINTILI MOD ================= -->
 <div class="wrap">
   <header>
     <div>
-      <p class="eyebrow">Megalar Yarışıyor · Müşteri Hattı</p>
+      <p class="eyebrow">Megalar Yarışıyor · Müşteri Hattı · ayrıntılı ekran (M ile sahneye dön)</p>
       <h1>Alkışmetre</h1>
     </div>
     <div class="link" id="linkInfo">Ana ekran bağlantısı: <b>yok</b></div>
@@ -100,18 +164,19 @@ kbd{font-family:var(--f-body);font-size:12px;font-weight:600;border:1px solid cu
         <button id="micBtn" class="primary">Mikrofonu aç</button>
         <button id="demoBtn">Demo modu</button>
         <button id="fsBtn">Tam ekran</button>
+        <button id="simpleBtn">Sahne ekranı <kbd>M</kbd></button>
       </div>
       <div class="teams">
         <article class="team a" id="card0">
           <h2 id="name0">Takım A</h2>
           <button id="meas0" disabled>Ölç <kbd>A</kbd></button>
-          <dl><div><dt>Ortalama</dt><dd id="avg0">–</dd></div><div><dt>Tepe</dt><dd id="peak0">–</dd></div></dl>
+          <dl><div><dt>En yüksek</dt><dd id="peak0">–</dd></div><div><dt>Ortalama</dt><dd id="avg0">–</dd></div></dl>
           <div class="bar"><i id="bar0"></i></div>
         </article>
         <article class="team b" id="card1">
           <h2 id="name1">Takım B</h2>
           <button id="meas1" disabled>Ölç <kbd>B</kbd></button>
-          <dl><div><dt>Ortalama</dt><dd id="avg1">–</dd></div><div><dt>Tepe</dt><dd id="peak1">–</dd></div></dl>
+          <dl><div><dt>En yüksek</dt><dd id="peak1">–</dd></div><div><dt>Ortalama</dt><dd id="avg1">–</dd></div></dl>
           <div class="bar"><i id="bar1"></i></div>
         </article>
       </div>
@@ -129,29 +194,35 @@ kbd{font-family:var(--f-body);font-size:12px;font-weight:600;border:1px solid cu
     <h2>Tanılama</h2>
     <dl id="diag"></dl>
     <p class="err" id="err" hidden></p>
-    <p class="note">Kazananı 5 saniyelik ortalama seviye belirler. Tepe değeri tek bir ıslıkla yükselebildiği için yalnızca bilgi olarak gösterilir. Değer göreli bir dB'dir: iki takımı karşılaştırmak için güvenilir, resmi ses ölçer yerine geçmez. Kabaca +3 dB fark, iki kat ses enerjisi demektir.</p>
+    <p class="note">Ölçüm 10 saniye sürer. "En yüksek" değer, bu sürenin en gürültülü 1 saniyesinin ortalamasıdır ve kazananı o belirler. Böylece tek bir ıslık ya da bağırış sonucu değiştirmez. Ortalama, 10 saniyenin tamamı için bilgi amaçlı gösterilir. Değer göreli bir dB'dir: iki takımı karşılaştırmak için güvenilir, resmi ses ölçer yerine geçmez. Kabaca +3 dB fark, iki kat ses enerjisi demektir.</p>
   </section>
 </div>
 
 <script>
 (()=>{
-const MIN=30, MAX=120, PRE=3000, MEAS=5000;
+const MIN=30, MAX=120, PRE=3000, MEAS=10000, WIN=1000, GO=700;
 const CX=200, CY=212, R=172;
 const qs=new URLSearchParams(location.search);
 const NAMES=[qs.get("a")||"Takım A", qs.get("b")||"Takım B"];
 const TEAMCOL=["var(--red)","var(--purple-hi)"];
 const $=id=>document.getElementById(id);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const toDb=ms=>10*Math.log10(Math.max(ms,1e-12));
 const NS="http://www.w3.org/2000/svg";
 
-let ac=null, an=null, buf=null, stream=null, demo=false, live=false;
+let ac=null, an=null, buf=null, stream=null, demo=false, live=false, micTried=false;
 let cal=100, level=-Infinity, sessionPeak=-Infinity;
 const res=[null,null];
 let job=null;
 const diag={};
 const msgLog=[];
+const disp=[MIN,MIN];
 
-$("name0").textContent=NAMES[0]; $("name1").textContent=NAMES[1];
+for(const t of [0,1]){ $("name"+t).textContent=NAMES[t]; $("sn"+t).textContent=NAMES[t]; }
+
+/* ---------- mod ---------- */
+function isSimple(){ return document.body.classList.contains("simple"); }
+function toggleMode(){ document.body.classList.toggle("simple"); }
 
 /* ---------- ana ekranla haberleşme ---------- */
 function hasOpener(){ try{ return !!window.opener && !window.opener.closed; }catch(e){ return false; } }
@@ -161,9 +232,9 @@ function send(type,data){
   catch(e){ diag.link=pill("bad","Gönderilemedi: "+(e.name||"hata")); renderDiag(); return false; }
 }
 function resultPayload(){
-  const out={teams:NAMES, avg:[null,null], peak:[null,null], winner:null, diff:null};
-  for(const t of [0,1]) if(res[t]){ out.avg[t]=+(res[t].avgFS+cal).toFixed(1); out.peak[t]=+(res[t].peakFS+cal).toFixed(1); }
-  if(res[0]&&res[1]){ const d=res[0].avgFS-res[1].avgFS; out.diff=+Math.abs(d).toFixed(1); out.winner=Math.abs(d)<1?null:(d>0?0:1); }
+  const out={teams:NAMES, peak:[null,null], avg:[null,null], winner:null, diff:null};
+  for(const t of [0,1]) if(res[t]){ out.peak[t]=+(res[t].peakFS+cal).toFixed(1); out.avg[t]=+(res[t].avgFS+cal).toFixed(1); }
+  if(res[0]&&res[1]){ const d=res[0].peakFS-res[1].peakFS; out.diff=+Math.abs(d).toFixed(1); out.winner=Math.abs(d)<1?null:(d>0?0:1); }
   return out;
 }
 window.addEventListener("message",e=>{
@@ -177,38 +248,39 @@ window.addEventListener("message",e=>{
 });
 
 /* ---------- gösterge ---------- */
-const svg=$("gauge");
-function el(tag,attrs,parent=svg){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); parent.appendChild(e); return e; }
 function pt(v,r){ const t=clamp((v-MIN)/(MAX-MIN),0,1), a=Math.PI-t*Math.PI; return [CX+r*Math.cos(a), CY-r*Math.sin(a)]; }
-const arcD=`M ${CX-R} ${CY} A ${R} ${R} 0 0 1 ${CX+R} ${CY}`;
-el("path",{d:arcD,fill:"none",stroke:"var(--line)","stroke-width":16,"stroke-linecap":"round"});
-const arc=el("path",{d:arcD,fill:"none",stroke:"var(--gold)","stroke-width":16,"stroke-linecap":"round",pathLength:100,"stroke-dasharray":"0 100"});
-for(let v=MIN; v<=MAX; v+=2){
-  const major=v%10===0, [x1,y1]=pt(v,R-22), [x2,y2]=pt(v,R-(major?38:29));
-  el("line",{x1,y1,x2,y2,stroke:major?"var(--fg)":"var(--muted)","stroke-width":major?2.5:1.2,"stroke-linecap":"round",opacity:major?1:.6});
-  if(major&&v>MIN&&v<MAX){ const [lx,ly]=pt(v,R-56); const t=el("text",{x:lx,y:ly+5,"text-anchor":"middle","font-family":"Barlow Condensed, Arial Narrow, sans-serif","font-weight":700,"font-size":16,fill:"var(--muted)"}); t.textContent=v; }
+function makeGauge(svg){
+  const el=(tag,attrs,parent=svg)=>{ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); parent.appendChild(e); return e; };
+  const arcD=`M ${CX-R} ${CY} A ${R} ${R} 0 0 1 ${CX+R} ${CY}`;
+  el("path",{d:arcD,fill:"none",stroke:"var(--line)","stroke-width":16,"stroke-linecap":"round"});
+  const arc=el("path",{d:arcD,fill:"none",stroke:"var(--gold)","stroke-width":16,"stroke-linecap":"round",pathLength:100,"stroke-dasharray":"0 100"});
+  for(let v=MIN; v<=MAX; v+=2){
+    const major=v%10===0, [x1,y1]=pt(v,R-22), [x2,y2]=pt(v,R-(major?38:29));
+    el("line",{x1,y1,x2,y2,stroke:major?"var(--fg)":"var(--muted)","stroke-width":major?2.5:1.2,"stroke-linecap":"round",opacity:major?1:.6});
+    if(major&&v>MIN&&v<MAX){ const [lx,ly]=pt(v,R-56); const t=el("text",{x:lx,y:ly+5,"text-anchor":"middle","font-family":"Barlow Condensed, Arial Narrow, sans-serif","font-weight":700,"font-size":16,fill:"var(--muted)"}); t.textContent=v; }
+  }
+  const peakDot=el("circle",{r:7,fill:"var(--amber)",cx:-50,cy:-50});
+  const needle=el("g",{});
+  el("line",{x1:CX,y1:CY,x2:CX-(R-30),y2:CY,stroke:"var(--fg)","stroke-width":5,"stroke-linecap":"round"},needle);
+  el("circle",{cx:CX,cy:CY,r:13,fill:"var(--fg)"});
+  el("circle",{cx:CX,cy:CY,r:5,fill:"var(--bg)"});
+  return function draw(v,color,peak){
+    const t=clamp(((v==null||!isFinite(v)?MIN:v)-MIN)/(MAX-MIN),0,1);
+    needle.setAttribute("transform",`rotate(${(t*180).toFixed(2)} ${CX} ${CY})`);
+    arc.setAttribute("stroke-dasharray",`${(t*100).toFixed(2)} 100`);
+    arc.setAttribute("stroke",color);
+    if(peak!=null&&isFinite(peak)){ const [px,py]=pt(peak,R); peakDot.setAttribute("cx",px); peakDot.setAttribute("cy",py); }
+    else { peakDot.setAttribute("cx",-50); peakDot.setAttribute("cy",-50); }
+  };
 }
-const peakDot=el("circle",{r:7,fill:"var(--amber)",cx:-50,cy:-50});
-const needle=el("g",{});
-el("line",{x1:CX,y1:CY,x2:CX-(R-30),y2:CY,stroke:"var(--fg)","stroke-width":5,"stroke-linecap":"round"},needle);
-el("circle",{cx:CX,cy:CY,r:13,fill:"var(--fg)"});
-el("circle",{cx:CX,cy:CY,r:5,fill:"var(--bg)"});
-
-function drawGauge(){
-  const v=isFinite(level)?level:MIN, t=clamp((v-MIN)/(MAX-MIN),0,1);
-  needle.setAttribute("transform",`rotate(${(t*180).toFixed(2)} ${CX} ${CY})`);
-  arc.setAttribute("stroke-dasharray",`${(t*100).toFixed(2)} 100`);
-  arc.setAttribute("stroke", job ? TEAMCOL[job.team] : "var(--gold)");
-  if(isFinite(sessionPeak)){ const [px,py]=pt(sessionPeak,R); peakDot.setAttribute("cx",px); peakDot.setAttribute("cy",py); }
-  else { peakDot.setAttribute("cx",-50); peakDot.setAttribute("cy",-50); }
-  $("dbNow").textContent = live ? Math.round(clamp(v,0,140)) : "·";
-}
+const drawMain=makeGauge($("gauge"));
+const drawSimple=[makeGauge($("sg0")),makeGauge($("sg1"))];
 
 /* ---------- ses okuma ---------- */
 function sampleMS(now){
   if(demo){
     let d=-58+(Math.random()-.5)*5;
-    if(job&&job.phase==="meas"){ const e=(now-job.t0)/MEAS; const env=Math.min(1,e*5)*(1-Math.max(0,e-.85)*3); d=-58+(job.demoTarget+58)*env+4*Math.sin(now/140)+(Math.random()-.5)*7; }
+    if(job&&job.phase==="meas"){ const e=(now-job.t0)/MEAS; const env=Math.min(1,e*4)*(1-Math.max(0,e-.85)*3); d=-58+(job.demoTarget+58)*env+4*Math.sin(now/180)+(Math.random()-.5)*7; }
     return Math.pow(10,d/10);
   }
   if(!an) return 0;
@@ -218,50 +290,90 @@ function sampleMS(now){
 }
 function setPhase(text,liveCls){ const p=$("phase"); if(p.textContent!==text) p.textContent=text; p.classList.toggle("live",!!liveCls); }
 
+/* ---------- 3-2-1 katmanı ---------- */
+const cd=$("count");
+function showCount(txt,team,go){
+  if(cd.hidden) cd.hidden=false;
+  if(cd.dataset.t===txt) return;
+  cd.dataset.t=txt; cd.textContent=txt;
+  cd.className=`count ${team?"b":"a"}${go?" go":""}`;
+  void cd.offsetWidth; cd.classList.add("pop");
+}
+function hideCount(){ if(!cd.hidden){ cd.hidden=true; cd.dataset.t=""; } }
+
+/* ---------- döngü ---------- */
 function tick(now){
   const ms=sampleMS(now);
-  const dbfs = ms>1e-12 ? 10*Math.log10(ms) : -120;
-  const db = dbfs+cal;
+  const db=toDb(ms)+cal;
   if(live){ if(!isFinite(level)) level=db; else level += (db-level)*(db>level?0.45:0.07); }
   else level=-Infinity;
 
+  let elapsed=0;
   if(job){
-    const elapsed=now-job.t0;
+    elapsed=now-job.t0;
     if(job.phase==="pre"){
-      const left=Math.ceil((PRE-elapsed)/1000);
-      setPhase(`${NAMES[job.team]} hazırlansın… ${Math.max(left,1)}`,true);
-      $("progBar").style.width="0%";
-      if(elapsed>=PRE){ job.phase="meas"; job.t0=now; job.sum=0; job.n=0; job.peak=-Infinity; sessionPeak=-Infinity; }
+      setPhase(`${NAMES[job.team]} hazırlansın… ${Math.max(1,Math.ceil((PRE-elapsed)/1000))}`,true);
+      $("progBar").style.width="0%"; $("sp"+job.team).style.width="0%";
+      if(elapsed>=PRE){ Object.assign(job,{phase:"meas",t0:now,sum:0,n:0,win:[],wsum:0,peakFS:-Infinity,liveFS:-120}); sessionPeak=-Infinity; elapsed=0; }
     } else {
       job.sum+=ms; job.n++;
-      job.peak=Math.max(job.peak,level); sessionPeak=Math.max(sessionPeak,level);
-      $("progBar").style.width=`${clamp(elapsed/MEAS,0,1)*100}%`;
+      job.win.push([now,ms]); job.wsum+=ms;
+      while(job.win.length>1 && now-job.win[0][0]>WIN) job.wsum-=job.win.shift()[1];
+      job.liveFS=toDb(job.wsum/job.win.length);
+      if(elapsed>=WIN/2) job.peakFS=Math.max(job.peakFS,job.liveFS);
+      sessionPeak=isFinite(job.peakFS)?job.peakFS+cal:-Infinity;
+      const p=`${clamp(elapsed/MEAS,0,1)*100}%`;
+      $("progBar").style.width=p; $("sp"+job.team).style.width=p;
       setPhase(`${NAMES[job.team]} için ALKIŞ!`,true);
       if(elapsed>=MEAS) finish();
     }
   }
-  drawGauge();
+
+  /* 3-2-1 yalnızca sahne ekranında */
+  if(isSimple()&&job&&job.phase==="pre") showCount(String(Math.max(1,Math.ceil((PRE-elapsed)/1000))),job.team,false);
+  else if(isSimple()&&job&&job.phase==="meas"&&elapsed<GO) showCount("ALKIŞ!",job.team,true);
+  else hideCount();
+
+  /* ayrıntılı ölçer: canlı seviye */
+  drawMain(live?level:null, job?TEAMCOL[job.team]:"var(--gold)", isFinite(sessionPeak)?sessionPeak:null);
+  $("dbNow").textContent = live&&isFinite(level) ? Math.round(clamp(level,0,140)) : "·";
+
+  /* sahne ölçerleri */
+  for(const t of [0,1]){
+    let target=MIN, peak=null, num="–", fast=false;
+    if(job&&job.team===t){
+      if(job.phase==="meas"){ target=job.liveFS+cal; peak=isFinite(job.peakFS)?job.peakFS+cal:null; num=String(Math.round(clamp(target,0,140))); fast=true; }
+    } else if(res[t]){ target=res[t].peakFS+cal; peak=target; num=fmt(target); }
+    disp[t] += (target-disp[t])*(fast?0.35:0.08);
+    drawSimple[t](disp[t], TEAMCOL[t], peak);
+    const sv=$("sv"+t); if(sv.textContent!==num){ sv.textContent=num; sv.parentNode.classList.toggle("idle",num==="–"); }
+  }
   requestAnimationFrame(tick);
 }
 
 /* ---------- ölçüm ---------- */
 function start(team){
   if(!live||job) return;
+  if(ac&&ac.state!=="running") ac.resume().catch(()=>{});
+  res[team]=null;
   job={team,phase:"pre",t0:performance.now(),demoTarget:-26+Math.random()*12};
-  sessionPeak=-Infinity; syncButtons();
+  sessionPeak=-Infinity; $("sp"+team).style.width="0%";
+  renderResults(); syncButtons();
   send("measuring",{team});
 }
 function finish(){
   const j=job; job=null;
-  const avgFS = j.n ? 10*Math.log10(Math.max(j.sum/j.n,1e-12)) : -120;
-  res[j.team]={avgFS, peakFS:j.peak-cal};
+  const avgFS = j.n ? toDb(j.sum/j.n) : -120;
+  const peakFS = isFinite(j.peakFS) ? j.peakFS : j.liveFS;
+  res[j.team]={avgFS, peakFS};
   setPhase(`${NAMES[j.team]} ölçüldü`);
   $("progBar").style.width="100%";
   renderResults(); syncButtons();
   send("result",resultPayload());
 }
 function reset(){
-  job=null; res[0]=res[1]=null; sessionPeak=-Infinity; $("progBar").style.width="0%";
+  job=null; res[0]=res[1]=null; sessionPeak=-Infinity;
+  $("progBar").style.width="0%"; $("sp0").style.width="0%"; $("sp1").style.width="0%";
   setPhase(live?"Dinleniyor":"Mikrofon kapalı");
   renderResults(); syncButtons();
   send("result",resultPayload());
@@ -270,23 +382,34 @@ function fmt(v){ return v.toFixed(1).replace(".",","); }
 function renderResults(){
   for(const t of [0,1]){
     const r=res[t];
-    $("avg"+t).textContent = r ? fmt(r.avgFS+cal) : "–";
     $("peak"+t).textContent = r ? fmt(r.peakFS+cal) : "–";
-    $("bar"+t).style.width = r ? `${clamp((r.avgFS+cal-MIN)/(MAX-MIN),0,1)*100}%` : "0%";
+    $("avg"+t).textContent = r ? fmt(r.avgFS+cal) : "–";
+    $("bar"+t).style.width = r ? `${clamp((r.peakFS+cal-MIN)/(MAX-MIN),0,1)*100}%` : "0%";
     $("card"+t).classList.remove("win");
+    $("sc"+t).classList.remove("win","lose");
   }
-  const v=$("verdict");
+  const v=$("verdict"), sv=$("stitle");
   if(res[0]&&res[1]){
-    const d=res[0].avgFS-res[1].avgFS;
-    v.classList.add("done");
-    if(Math.abs(d)<1) v.textContent=`Başa baş. Fark ${fmt(Math.abs(d))} dB, 1 dB'den az. Tekrar ölçmek iyi olur.`;
-    else { const w=d>0?0:1; $("card"+w).classList.add("win"); v.textContent=`${NAMES[w]} kazandı · fark ${fmt(Math.abs(d))} dB`; }
-  } else { v.classList.remove("done"); v.textContent="İki takım da ölçülünce kazanan burada görünür."; }
+    const d=res[0].peakFS-res[1].peakFS, diff=fmt(Math.abs(d));
+    v.classList.add("done"); sv.classList.add("done");
+    if(Math.abs(d)<1){
+      v.textContent=`Başa baş. Fark ${diff} dB, 1 dB'den az. Tekrar ölçmek iyi olur.`;
+      sv.innerHTML=`Başa baş!<small>fark ${diff} dB</small>`;
+    } else {
+      const w=d>0?0:1;
+      $("card"+w).classList.add("win"); $("sc"+w).classList.add("win"); $("sc"+(1-w)).classList.add("lose");
+      v.textContent=`${NAMES[w]} kazandı · fark ${diff} dB`;
+      sv.innerHTML=`${esc(NAMES[w])} kazandı!<small>fark ${diff} dB</small>`;
+    }
+  } else { v.classList.remove("done"); v.textContent="İki takım da ölçülünce kazanan burada görünür."; sv.classList.remove("done"); sv.textContent="Alkışlar kime?"; }
 }
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function syncButtons(){
-  for(const t of [0,1]) $("meas"+t).disabled = !live || !!job;
-  $("micBtn").disabled = !!job; $("demoBtn").disabled = !!job;
+  for(const t of [0,1]){ const off=!live||!!job; $("meas"+t).disabled=off; $("sb"+t).disabled=off; }
+  $("micBtn").disabled=!!job; $("demoBtn").disabled=!!job;
   $("sendBtn").disabled = !!job || !hasOpener() || !(res[0]&&res[1]);
+  const sm=$("smic");
+  sm.textContent = live ? (demo?"Demo modu açık":"") : (micTried?"Mikrofon kapalı · M ile ayrıntılı ekrana geç":"Mikrofon açılıyor…");
 }
 
 /* ---------- tanılama ---------- */
@@ -350,6 +473,7 @@ async function openMic(){
     setPhase("Mikrofon açılamadı");
     send("mic",{ok:false,error:(e&&e.name)||"Hata"});
   }
+  micTried=true;
   renderDiag(); syncButtons();
 }
 function toggleDemo(){
@@ -359,20 +483,26 @@ function toggleDemo(){
   else { live=!!an; $("demoBtn").textContent="Demo modu"; setPhase(live?"Dinleniyor":"Mikrofon kapalı"); }
   syncButtons();
 }
+function fullscreen(){
+  const d=document.documentElement;
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  else if(d.requestFullscreen) d.requestFullscreen().catch(()=>{});
+}
 
 $("micBtn").addEventListener("click",openMic);
 $("demoBtn").addEventListener("click",toggleDemo);
-$("fsBtn").addEventListener("click",()=>{ const d=document.documentElement; (d.requestFullscreen?d.requestFullscreen():Promise.reject()).catch(()=>{}); });
-$("meas0").addEventListener("click",()=>start(0));
-$("meas1").addEventListener("click",()=>start(1));
+$("fsBtn").addEventListener("click",fullscreen);
+$("simpleBtn").addEventListener("click",toggleMode);
+for(const t of [0,1]){ $("meas"+t).addEventListener("click",()=>start(t)); $("sb"+t).addEventListener("click",()=>start(t)); }
 $("resetBtn").addEventListener("click",reset);
 $("sendBtn").addEventListener("click",()=>{ send("result",Object.assign(resultPayload(),{final:true})); setTimeout(()=>window.close(),150); });
 $("cal").addEventListener("input",e=>{ cal=+e.target.value; $("calOut").textContent=(cal>=0?"+":"")+cal; renderResults(); });
-document.addEventListener("pointerdown",()=>{ if(ac&&ac.state!=="running") ac.resume().then(()=>{ if(live&&!job) setPhase(demo?"Demo: sahte alkış":"Dinleniyor"); }); });
+document.addEventListener("pointerdown",()=>{ if(ac&&ac.state!=="running") ac.resume().then(()=>{ if(live&&!job) setPhase(demo?"Demo: sahte alkış":"Dinleniyor"); }).catch(()=>{}); });
 document.addEventListener("keydown",e=>{
   if(e.target.tagName==="INPUT"||e.metaKey||e.ctrlKey||e.altKey) return;
   const k=e.key.toLowerCase();
   if(k==="a") start(0); else if(k==="b") start(1); else if(k==="r") reset();
+  else if(k==="m") toggleMode(); else if(k==="f") fullscreen();
 });
 window.addEventListener("beforeunload",()=>send("closed",{}));
 
